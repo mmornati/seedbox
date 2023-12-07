@@ -4,16 +4,10 @@ services:
     container_name: deluge
     restart: always
     volumes:
-      - torrents:/torrents
-      - configdeluge:/config
-      - downloads:/downloads
+      - $HOST_MEDIA_PATH:/torrents
+      - $HOST_CONFIG_PATH/deluge:/config
+      - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
-
-volumes:
-  configdeluge: 
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/deluge

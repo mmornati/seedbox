@@ -11,10 +11,10 @@ services:
       - serverPort=8266
       - webUIPort=8265
     volumes:
-      - torrents:/media
-      - transcodes:/temp
-      - configtdarrv2:/app/server
-      - settingstdarrv2:/app/configs
+      - $HOST_MEDIA_PATH:/media
+      - $HOST_CONFIG_PATH/tdarrv2/transcodes:/temp
+      - $HOST_CONFIG_PATH/tdarrv2/server:/app/server
+      - $HOST_CONFIG_PATH/tdarrv2/configs:/app/configs
 
   tdarr_node:
     image: haveagitgat/tdarr_node:latest
@@ -30,22 +30,8 @@ services:
       - serverIP=tdarr
       - serverPort=8266
     volumes:
-      - torrents:/media
-      - transcodes:/temp
-      - settingstdarrv2:/app/configs
+      - $HOST_MEDIA_PATH:/media
+      - $HOST_CONFIG_PATH/tdarrv2/transcodes:/temp
+      - $HOST_CONFIG_PATH/tdarrv2/configs:/app/configs
     labels:
       - "traefik.enable=false"
-
-volumes:
-  configtdarrv2:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/tdarrv2/server
-  settingstdarrv2:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/tdarrv2/configs
-  transcodes:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/tdarrv2/transcodes

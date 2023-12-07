@@ -4,16 +4,11 @@ services:
     container_name: radarr
     restart: always
     volumes:
-      - configradarr:/config
-      - torrents:/torrents
+      - $HOST_CONFIG_PATH/radarr:/config
+      - $HOST_MEDIA_PATH:/torrents
+      - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads
       - /etc/localtime:/etc/localtime:ro
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
-
-volumes:
-  configradarr: 
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/radarr

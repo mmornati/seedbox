@@ -19,6 +19,9 @@ for i in "$@"; do
     --debug)
       DEBUG=1
       ;;
+    --shutdown)
+      SHUTDOWN=1
+      ;;
     *)
       echo "[$0] ❌ ERROR: unknown parameter \"$i\""
       exit 1
@@ -284,13 +287,21 @@ if [[ "${SKIP_PULL}" != "1" ]]; then
   ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} pull
 fi
 
-echo "[$0] ***** Recreating containers if required... *****"
-${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} up -d --remove-orphans
-echo "[$0] ***** Done updating containers *****"
+if [[ "${SHUTDOWN}" != "1" ]]; then
+	echo "[$0] ***** Recreating containers if required... *****"
+	${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} up -d --remove-orphans
+	echo "[$0] ***** Done updating containers *****"
+else
+	echo "[$0] ***** Stopping... *****"
+	${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} down --remove-orphans
+	echo "[$0] ***** Done stopping containers *****"
+fi
 
-echo "[$0] ***** Clean unused images and volumes... *****"
-docker image prune -af
-docker volume prune  -f
+if [[ "${SHUTDOWN}" != "1" ]]; then
+  echo "[$0] ***** Clean unused images and volumes... *****"
+  docker image prune -af
+  docker volume prune  -f
+fi
 
 echo "[$0] ***** Done! *****"
 exit 0

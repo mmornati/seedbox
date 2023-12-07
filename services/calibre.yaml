@@ -10,11 +10,5 @@ services:
       - PASSWORD=${CALIBRE_PASSWORD}
       - CLI_ARGS=
     volumes:
-      - configcalibre:/config
-      - torrents:/torrents
-
-volumes:
-  configcalibre: 
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/calibre
+      - $HOST_CONFIG_PATH/calibre:/config
+      - $HOST_MEDIA_PATH:/torrents

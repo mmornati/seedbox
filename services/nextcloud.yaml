@@ -12,7 +12,7 @@ services:
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         - TZ=${TZ}
       volumes: 
-        - nextclouddb:/var/lib/mysql
+        - $HOST_CONFIG_PATH/nextcloud-db:/var/lib/mysql
       labels:
         - "traefik.enable=false"
 
@@ -28,21 +28,7 @@ services:
       - PUID=${PUID}
       - TZ=${TZ}
     volumes:
-      - confignextcloud:/config
-      - nextclouddata:/data
-      - torrents:/torrents
-      - config:/seedbox-config
-
-volumes:
-  nextclouddb:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/nextcloud-db
-  confignextcloud:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/nextcloud
-  nextclouddata:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/nextcloud-data
+      - $HOST_CONFIG_PATH/nextcloud:/config
+      - $HOST_CONFIG_PATH/nextcloud-data:/data
+      - $HOST_MEDIA_PATH:/torrents
+      - $HOST_CONFIG_PATH/nextcloud:/seedbox-config

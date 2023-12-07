@@ -8,18 +8,3 @@ version: "3.8"
 networks: 
   default:
     name: "traefik-network"
-
-# Common volumes used by at least 2 services
-volumes:
-  config:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH
-  torrents:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_MEDIA_PATH
-  downloads:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER

@@ -16,17 +16,11 @@ services:
     devices:
       - /dev/dri:/dev/dri # for hardware transcoding
     volumes:
-      - configplex:/config
-      - torrents:/torrents
+      - $HOST_CONFIG_PATH/Plex:/config
+      - $HOST_MEDIA_PATH:/torrents
       - /dev/shm:/transcode
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
       - VERSION=latest
-
-volumes:
-  configplex:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/Plex

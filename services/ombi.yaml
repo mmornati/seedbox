@@ -4,15 +4,9 @@ services:
     container_name: ombi
     restart: always
     volumes:
-      - configombi:/config
+      - $HOST_CONFIG_PATH/ombi:/config
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
       - BASE_URL=/
-
-volumes:
-  configombi:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/ombi
