@@ -29,6 +29,15 @@ services:
         - host: flood.${TRAEFIK_DOMAIN}
           httpAuth: true
           internalPort: 3000
+  - name: qbittorrent
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: qbittorrent.${TRAEFIK_DOMAIN}
+          httpAuth: true
+          internalPort: 8080
   - name: plex
     enabled: true
     vpn: false
@@ -174,6 +183,15 @@ services:
         - host: tautulli.${TRAEFIK_DOMAIN}
           httpAuth: false
           internalPort: 8181
+  - name: ntfy
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: ntfy.${TRAEFIK_DOMAIN}
+          httpAuth: true
+          internalPort: 2586
   - name: jdownloader
     enabled: true
     vpn: false
@@ -202,6 +220,15 @@ services:
           httpAuth: false
           internalPort: 443
           internalScheme: https
+  - name: paperless
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: paperless.${TRAEFIK_DOMAIN}
+          httpAuth: true
+          internalPort: 8000
   - name: portainer
     enabled: true
     vpn: false
@@ -248,6 +275,15 @@ services:
         - host: ${TRAEFIK_DOMAIN}
           httpAuth: true
           internalPort: 80
+  - name: homarr
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: homarr.${TRAEFIK_DOMAIN}
+          httpAuth: true
+          internalPort: 7575
   # Gluetun is the VPN client service.
   - name: gluetun
     enabled: false

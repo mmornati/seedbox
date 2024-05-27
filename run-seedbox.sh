@@ -53,6 +53,33 @@ fi
 source .env
 echo "${HTTP_USER}:${HTTP_PASSWORD}" > traefik/http_auth
 
+# Sanitize and extract variable (without prefixes) from .env.custom file
+# Input => $1 = app name (exemple traefik)
+# Output => app_name.env written with correct variables (exemple: traefik.env)
+extract_custom_env_file() {
+  # sed explanation:
+  #   1 => Remove all lines starting with a comment (#)
+  #   2 => Remove all empty lines
+  #   3 => Remove all lines *NOT* starting by [uppercase_app_name + "_"] (exemple TRAEFIK_)
+  #   4 => Remove the pattern [uppercase_app_name + "_"]
+  sed '/^#/d' .env.custom | sed '/^$/d' | sed -n "/^${1^^}_/p" | sed "s/^${1^^}_//g" > $1.env
+}
+
+## Traefik Certificate Resolver tweaks
+if [[ ! -z ${TRAEFIK_CUSTOM_ACME_RESOLVER} ]]; then
+  if [[ ! -f .env.custom ]]; then
+    echo "[$0] Error. You need to have a .env.custom in order to use TRAEFIK_CUSTOM_ACME_RESOLVER variable."
+    exit 1
+  fi
+  if [[ ${TRAEFIK_CUSTOM_ACME_RESOLVER} == "changeme" ]]; then
+    echo "[$0] Error. Wrong value for TRAEFIK_CUSTOM_ACME_RESOLVER variable."
+    exit 1
+  fi
+  yq 'del(.certificatesResolvers.le.acme.httpChallenge)' -i traefik/traefik.yaml
+  yq '(.certificatesResolvers.le.acme.dnsChallenge.provider="'${TRAEFIK_CUSTOM_ACME_RESOLVER}'")' -i traefik/traefik.yaml
+  extract_custom_env_file traefik
+fi
+
 # Docker-compose settings
 export COMPOSE_HTTP_TIMEOUT=240
 
@@ -75,21 +102,68 @@ echo "[$0] ***** Checking configuration... *****"
 
 yq eval -o json config.yaml > config.json
 
-if [[ ${CHECK_FOR_OUTDATED_CONFIG} == true ]]; then
+if [[ "${CHECK_FOR_OUTDATED_CONFIG}" == true ]]; then
   nb_services=$(cat config.json | jq '.services | length')
   nb_services_sample=$(yq eval -o json config.sample.yaml | jq '.services | length')
   if [[ $nb_services_sample -gt $nb_services ]]; then
     echo "[$0] There are more services in the config.sample.yaml than in your config.yaml"
     echo "[$0] You should check config.sample.yaml because it seems there are new services available for you:"
-    diff -u config.yaml config.sample.yaml | grep "name:" | grep -E "^\+" || true
+    diff -u config.yaml config.sample.yaml | grep "name:" | grep -E "^\+" | sed "s/+  - name:/-/g" || true
   fi
 fi
 
+# Internal function which checks another function's number ($2) and return a boolean instead
+check_result_service() {
+  #$1 => service
+  #$2 => nb to check
+  if [[ $2 == 0 ]]; then
+    false; return
+  elif [[ $2 == 1 ]]; then
+    true; return
+  else
+    echo "[$0] Error. Service \"$1\" is enabled more than once. Check your config.yaml file."
+    exit 1
+  fi
+}
+
+# Check if a service ($1) has been enabled in the config file
+is_service_enabled() {
+  local nb=$(cat config.json | jq --arg service $1 '[.services[] | select(.name==$service and .enabled==true)] | length')
+  check_result_service $1 $nb
+}
+
+# Check if a service ($1) has been enabled AND has vpn enabled in the config file
+has_vpn_enabled() {
+  local nb=$(cat config.json | jq --arg service $1 '[.services[] | select(.name==$service and .enabled==true and .vpn==true)] | length')
+  check_result_service $1 $nb
+}
+
+# Check if a service ($1) has been enabled AND has SSO enabled in the config file
+has_sso_enabled() {
+  local nb=$(cat config.json | jq --arg service $1 '[.services[] | select(.name==$service and .enabled==true and .sso==true)] | length')
+  check_result_service $1 $nb
+}
+
 # Check if some services have vpn enabled, that gluetun itself is enabled
 nb_vpn=$(cat config.json | jq '[.services[] | select(.enabled==true and .vpn==true)] | length')
-gluetun_enabled=$(cat config.json | jq '[.services[] | select(.name=="gluetun" and .enabled==true)] | length')
-if [[ ${nb_vpn} -gt 0 && ${gluetun_enabled} == 0 ]]; then
+if [[ ${nb_vpn} -gt 0 ]] && ! is_service_enabled gluetun; then
   echo "[$0] ERROR. ${nb_vpn} VPN-enabled services have been enabled BUT gluetun has not been enabled. Please check your config.yaml file."
+  exit 1
+fi
+
+# Check if some services have Authentik enabled, that Authentik itself is enabled
+nb_sso=$(cat config.json | jq '[.services[] | select(.enabled==true and .traefik.rules[].sso==true)] | length')
+if [[ ${nb_sso} -gt 0 ]] && ! is_service_enabled authentik; then
+  echo "[$0] ERROR. ${nb_sso} SSO services have been enabled BUT Authentik itself has not been enabled. Please check your config.yaml file."
+  echo "[$0] ******* Exiting *******"
+  exit 1
+fi
+
+# Check that for a same rule, httpAuth and Authentik are not both enabled
+# TODO: fix the condition to allow multiple auth on multiple Traefik rules for a service
+nb_both_auth=$(cat config.json | jq '[.services[] | select(.traefik.rules[].httpAuth==true and .traefik.rules[].sso==true)] | length')
+if [[ ${nb_both_auth} -gt 0 ]]; then
+  echo "[$0] ERROR. ${nb_both_auth} services have both SSO/Authentik and HTTP Authentication enabled. Please choose only one for a rule."
   echo "[$0] ******* Exiting *******"
   exit 1
 fi
@@ -97,17 +171,16 @@ fi
 # Determine what host Flood should connect to
 # => If deluge vpn is enabled => gluetun
 # => If deluge vpn is disabled => deluge
-if [[ $(cat config.json | jq '[.services[] | select(.name=="flood" and .enabled==true)] | length') -eq 1 ]]; then
+if is_service_enabled flood; then
   # Check that if flood is enabled, deluge should also be enabled
-  if [[ $(cat config.json | jq '[.services[] | select(.name=="deluge" and .enabled==false)] | length') -eq 1 ]]; then
+  if ! is_service_enabled deluge; then
     echo "[$0] ERROR. Flood is enabled but Deluge is not. Please either enable Deluge or disable Flood as Flood depends on Deluge."
-    echo "[$0] ******* Exiting *******"
     exit 1
   fi
   # Determine deluge hostname (for flood) based on the VPN status (enabled or not) of deluge
-  if [[ $(cat config.json | jq '[.services[] | select(.name=="deluge" and .enabled==true and .vpn==true)] | length') -eq 1 ]]; then
+  if has_vpn_enabled deluge; then
     export DELUGE_HOST="gluetun"
-  elif [[ $(cat config.json | jq '[.services[] | select(.name=="deluge" and .enabled==true and .vpn==false)] | length') -eq 1 ]]; then
+  else
     export DELUGE_HOST="deluge"
   fi
 
@@ -124,12 +197,9 @@ if [[ $(cat config.json | jq '[.services[] | select(.name=="flood" and .enabled=
 fi
 
 # Check that if calibre-web is enabled, calibre should also be enabled
-if [[ $(cat config.json | jq '[.services[] | select(.name=="calibre-web" and .enabled==true)] | length') -eq 1 ]]; then
-  if [[ $(cat config.json | jq '[.services[] | select(.name=="calibre" and .enabled==false)] | length') -eq 1 ]]; then
-    echo "[$0] ERROR. Calibre-web is enabled but Calibre is not. Please either enable Calibre or disable Calibre-web as Calibre-web depends on Calibre."
-    echo "[$0] ******* Exiting *******"
-    exit 1
-  fi
+if is_service_enabled calibre-web && ! is_service_enabled calibre; then
+  echo "[$0] ERROR. Calibre-web is enabled but Calibre is not. Please either enable Calibre or disable Calibre-web as Calibre-web depends on Calibre."
+  exit 1
 fi
 
 # Apply other arbitrary custom Traefik config files
@@ -140,7 +210,7 @@ for f in `find samples/custom-traefik -maxdepth 1 -mindepth 1 -type f | grep -E 
 done
 
 # Detect Synology devices for Netdata compatibility
-if [[ $(cat config.json | jq '[.services[] | select(.name=="netdata" and .enabled==true)] | length') -eq 1 ]]; then
+if is_service_enabled netdata; then
   if [[ $(uname -a | { grep synology || true; } | wc -l) -eq 1 ]]; then
     export OS_RELEASE_FILEPATH="/etc/VERSION"
   else
@@ -158,6 +228,11 @@ echo "[$0] ***** Generating configuration... *****"
 rm -f services/generated/*-vpn.yaml
 
 ALL_SERVICES="-f docker-compose.yaml"
+
+# SSO => create dedicated Traefik service if SSO has been enabled
+if is_service_enabled authentik; then
+  echo "http.services.sso.loadBalancer.servers.0.url: http://authentik:9000/outpost.goauthentik.io" >> rules.props
+fi
 
 # Parse the config.yaml master configuration file
 for json in $(yq eval -o json config.yaml | jq -c ".services[]"); do
@@ -189,10 +264,23 @@ for json in $(yq eval -o json config.yaml | jq -c ".services[]"); do
   # go through gluetun (main vpn client service).
   if [[ ${vpn} == "true" ]]; then
     echo "services.${name}.network_mode: service:gluetun" > ${name}-vpn.props
-    yq -p=props ${name}-vpn.props > services/generated/${name}-vpn.yaml
+    yq -p=props ${name}-vpn.props -o yaml > services/generated/${name}-vpn.yaml
     rm -f ${name}-vpn.props
     # Append config/${name}-vpn.yaml to global list of files which will be passed to docker commands
     ALL_SERVICES="${ALL_SERVICES} -f services/generated/${name}-vpn.yaml"
+  fi
+
+  # For services with existing custom environment variables in .env.custom, 
+  # Extract those variables and add a docker-compose override file in order to load them
+  if [[ -f .env.custom ]]; then
+    if grep -q "^${name^^}_.*" .env.custom; then
+      extract_custom_env_file ${name}
+      echo "services.${name}.env_file.0: ./${name}.env" > ${name}-envfile.props
+      yq -p=props ${name}-envfile.props -o yaml > services/generated/${name}-envfile.yaml
+      rm -f ${name}-envfile.props
+      # Append config/${name}-envfile.yaml to global list of files which will be passed to docker commands
+      ALL_SERVICES="${ALL_SERVICES} -f services/generated/${name}-envfile.yaml"
+    fi
   fi
 
   ###################################### TRAEFIK RULES ######################################
@@ -212,9 +300,11 @@ for json in $(yq eval -o json config.yaml | jq -c ".services[]"); do
     host=$(echo $rule | jq -r .host)
     internalPort=$(echo $rule | jq -r .internalPort)
     httpAuth=$(echo $rule | jq -r .httpAuth)
+    sso=$(echo $rule | jq -r .sso)
     echo-debug "[$0]      Host => ${host}"
     echo-debug "[$0]      Internal Port => ${internalPort}"
     echo-debug "[$0]      Http Authentication => ${httpAuth}"
+    echo-debug "[$0]      SSO => ${sso}"
 
     # If VPN => Traefik rule should redirect to gluetun container
     backendHost=${name}
@@ -237,6 +327,15 @@ for json in $(yq eval -o json config.yaml | jq -c ".services[]"); do
       ((middlewareCount=middlewareCount+1))
     fi
 
+    if [[ ${sso} == "true" ]]; then
+      # Authelia
+      # echo "http.routers.${ruleId}.middlewares.${middlewareCount}: chain-authelia@file" >> rules.props
+      echo "http.routers.${ruleId}.middlewares.${middlewareCount}: authentik@file" >> rules.props
+      echo 'http.routers.'"${name}"'-sso.rule: Host(`'${hostTraefik}'`) && PathPrefix(`/outpost.goauthentik.io/`)' >> rules.props
+      echo "http.routers.${name}-sso.service: sso" >> rules.props
+      ((middlewareCount=middlewareCount+1))
+    fi
+
     traefikService=$(echo $rule | jq -r .service)
     if [[ ${traefikService} != "null" ]]; then
       echo "http.routers.${ruleId}.service: ${traefikService}" >> rules.props
@@ -250,9 +349,15 @@ for json in $(yq eval -o json config.yaml | jq -c ".services[]"); do
     httpOnly=$(echo $rule | jq -r .httpOnly)
     if [[ ${httpOnly} == true ]]; then
       echo "http.routers.${ruleId}.entryPoints.0: insecure" >> rules.props
+      if [[ ${sso} == "true" ]]; then
+        echo "http.routers.${name}-sso.entryPoints.0: insecure" >> rules.props
+      fi
     else
       echo "http.routers.${ruleId}.middlewares.${middlewareCount}: redirect-to-https" >> rules.props
       ((middlewareCount=middlewareCount+1))
+      if [[ ${sso} == "true" ]]; then
+        echo "http.routers.${name}-sso.middlewares.${middlewareCount}: redirect-to-https" >> rules.props
+      fi
     fi
 
     # If the specified service does not contain a "@" => we create it
@@ -266,7 +371,7 @@ done
 
 # Convert properties files into Traefik-ready YAML and place it in the correct folder loaded by Traefik
 mv traefik/custom/dynamic-rules.yaml traefik/custom/dynamic-rules-old.yaml || true
-yq -p=props rules.props > traefik/custom/dynamic-rules.yaml
+yq -p=props rules.props -o yaml > traefik/custom/dynamic-rules.yaml
 rm -f rules.props
 
 # Post-transformations on the rules file
@@ -299,7 +404,9 @@ fi
 
 if [[ "${SHUTDOWN}" != "1" ]]; then
   echo "[$0] ***** Clean unused images and volumes... *****"
-  docker image prune -af
+  if [[ "${SKIP_PULL}" != "1" ]]; then
+    docker image prune -af
+  fi
   docker volume prune  -f
 fi
 
