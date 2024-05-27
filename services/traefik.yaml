@@ -5,6 +5,8 @@ services:
     restart: always
     command:
       - --certificatesresolvers.le.acme.email=${ACME_MAIL}
+      - "--accesslog=true"
+      - "--accesslog.filePath=/config/access.log"
     ports:
       - "80:80"
       - "443:443"

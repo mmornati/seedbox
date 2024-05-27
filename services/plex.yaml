@@ -16,6 +16,7 @@ services:
     volumes:
       - $HOST_CONFIG_PATH/Plex:/config
       - $HOST_MEDIA_PATH:/torrents
+      - $HOST_MEDIA_PATH_2:/media
     environment:
       - PGID=${PGID}
       - PUID=${PUID}

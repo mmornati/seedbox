@@ -6,6 +6,7 @@ services:
     volumes:
       - $HOST_CONFIG_PATH/radarr:/config
       - $HOST_MEDIA_PATH:/torrents
+      - $HOST_MEDIA_PATH/movies:/movies
       - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads
       - /etc/localtime:/etc/localtime:ro
     environment:

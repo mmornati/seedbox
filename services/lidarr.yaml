@@ -6,6 +6,7 @@ services:
     volumes:
       - $HOST_CONFIG_PATH/lidarr:/config
       - $HOST_MEDIA_PATH:/torrents
+      - $HOST_MEDIA_PATH_2:/media
       - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads
     environment:
       - PGID=${PGID}
