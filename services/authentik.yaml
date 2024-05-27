@@ -15,6 +15,9 @@ services:
       POSTGRES_PASSWORD: ${PG_PASS:?database password required}
       POSTGRES_USER: ${PG_USER:-authentik}
       POSTGRES_DB: ${PG_DB:-authentik}
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
 
   authentik-redis:
     image: docker.io/library/redis:alpine
@@ -29,6 +32,10 @@ services:
       timeout: 3s
     volumes:
       - $HOST_CONFIG_PATH/authentik-redis:/data
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
 
   authentik:
     image: ghcr.io/goauthentik/server:latest
@@ -44,6 +51,9 @@ services:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
       AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
     volumes:
       - $HOST_CONFIG_PATH/authentik-media:/media
       - $HOST_CONFIG_PATH/authentik-templates:/templates
@@ -52,7 +62,7 @@ services:
       - authentik-redis
 
   authentik-worker:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.5.3}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:latest
     restart: always
     container_name: authentik-worker
     command: worker
@@ -65,6 +75,9 @@ services:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
       AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
     # `user: root` and the docker socket volume are optional.
     # See more for the docker socket integration here:
     # https://goauthentik.io/docs/outposts/integrations/docker

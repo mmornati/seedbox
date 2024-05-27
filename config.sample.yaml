@@ -7,6 +7,13 @@ services:
         - host: traefik.${TRAEFIK_DOMAIN}
           service: api@internal
           httpAuth: true
+  - name: authentik
+    enabled: true
+    traefik:
+      enabled: true
+      rules:
+        - host: authentik.${TRAEFIK_DOMAIN}
+          httpAuth: false
   - name: deluge
     enabled: true
     vpn: false
