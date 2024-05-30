@@ -18,3 +18,4 @@ services/generated/*.yaml
 authelia/*
 .env.custom
 *.env
+redis/*

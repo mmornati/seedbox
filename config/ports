@@ -22,3 +22,4 @@ netdata: 19999
 duplicati: 8200
 tautulli: 8181
 traefik: 80
+authelia: 9091
