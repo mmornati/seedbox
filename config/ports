@@ -23,3 +23,5 @@ duplicati: 8200
 tautulli: 8181
 traefik: 80
 authelia: 9091
+zitadel: 8080
+zitadel-db: 5432

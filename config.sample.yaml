@@ -27,6 +27,32 @@ services:
           # internalScheme: http
           # Uncomment to *NOT* generate LetsEncrypt certificate (useful for local domains)
           # httpOnly: true
+  - name: authelia
+    enabled: false
+    traefik:
+      enabled: true
+      rules:
+        - host: authelia.${TRAEFIK_DOMAIN}
+          internalPort: 9091
+          httpAuth: false
+          httpOnly: true
+  - name: zitadel
+    enabled: false
+    traefik:
+      enabled: true
+      rules:
+        - host: zitadel.${TRAEFIK_DOMAIN}
+          httpAuth: false
+          internalPort: 8080
+  - name: deluge
+    enabled: true
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: deluge.${TRAEFIK_DOMAIN}
+          httpAuth: true
+          internalPort: 8112
   - name: flood
     enabled: true
     vpn: false
