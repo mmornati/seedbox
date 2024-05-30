@@ -1,9 +1,8 @@
 services:
   zitadel:
     restart: 'always'
-    networks:
-      - 'zitadel'
     image: 'ghcr.io/zitadel/zitadel:latest'
+    container_name: zitadel
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       - ZITADEL_DATABASE_POSTGRES_HOST=zitadel-db
@@ -26,15 +25,19 @@ services:
   zitadel-db:
     restart: 'always'
     image: postgres:16-alpine
+    container_name: zitadel-db
     environment:
-      - POSTGRES_USER=${ZITADEL_DATABASE_POSTGRES_USER_USERNAME}
-      - POSTGRES_PASSWORD=${ZITADEL_DATABASE_POSTGRES_USER_PASSWORD}
+      - POSTGRES_USER=${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME}
+      - POSTGRES_PASSWORD=${ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD}
       - POSTGRES_DB=zitadel
-    networks:
-      - 'zitadel'
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
       interval: '10s'
       timeout: '30s'
       retries: 5
       start_period: '20s'
+    labels:
+      - "traefik.enable=false"

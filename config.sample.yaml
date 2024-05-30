@@ -14,19 +14,6 @@ services:
       rules:
         - host: authentik.${TRAEFIK_DOMAIN}
           httpAuth: false
-  - name: deluge
-    enabled: true
-    vpn: false
-    traefik:
-      enabled: true
-      rules:
-        - host: deluge.${TRAEFIK_DOMAIN}
-          httpAuth: true
-          internalPort: 8112
-          # Uncomment to specify custom schme (http by default)
-          # internalScheme: http
-          # Uncomment to *NOT* generate LetsEncrypt certificate (useful for local domains)
-          # httpOnly: true
   - name: authelia
     enabled: false
     traefik:
