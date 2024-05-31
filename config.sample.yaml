@@ -6,7 +6,7 @@ services:
       rules:
         - host: traefik.${TRAEFIK_DOMAIN}
           service: api@internal
-          httpAuth: true
+          sso: true
   - name: authentik
     enabled: true
     traefik:
@@ -14,6 +14,8 @@ services:
       rules:
         - host: authentik.${TRAEFIK_DOMAIN}
           httpAuth: false
+          internalPort: 9000
+          httpOnly: true
   - name: authelia
     enabled: false
     traefik:
