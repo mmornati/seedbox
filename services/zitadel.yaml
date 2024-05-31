@@ -5,7 +5,7 @@ services:
     container_name: zitadel
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
-      - ZITADEL_DATABASE_POSTGRES_HOST=zitadel-db
+      - ZITADEL_DATABASE_POSTGRES_HOST=zitadeldb
       - ZITADEL_DATABASE_POSTGRES_PORT=5432
       - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
       - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=${ZITADEL_DATABASE_POSTGRES_USER_USERNAME}
@@ -14,22 +14,25 @@ services:
       - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME}
       - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=${ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD}
       - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=${ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE}
-      - ZITADEL_EXTERNALSECURE=${ZITADEL_EXTERNALSECURE}
+      - ZITADEL_EXTERNALSECURE=false
+      - ZITADEL_TLS_ENABLED=false
+      - ZITADEL_EXTERNALDOMAIN=zitadel.${ZITADEL_EXTERNALDOMAIN}
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
     depends_on:
-      zitadel-db:
+      zitadeldb:
         condition: 'service_healthy'
 
-  zitadel-db:
+  zitadeldb:
     restart: 'always'
     image: postgres:16-alpine
-    container_name: zitadel-db
+    container_name: zitadeldb
     environment:
       - POSTGRES_USER=${ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME}
       - POSTGRES_PASSWORD=${ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD}
       - POSTGRES_DB=zitadel
+      - PGUSER=postgres
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
@@ -41,3 +44,4 @@ services:
       start_period: '20s'
     labels:
       - "traefik.enable=false"
+

@@ -10,7 +10,7 @@ services:
       retries: 5
       timeout: 5s
     volumes:
-      - $HOST_CONFIG_PATH/authentik-db:/var/lib/postgresql
+      - ./authentik/db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${PG_PASS:?database password required}
       POSTGRES_USER: ${PG_USER:-authentik}
@@ -18,6 +18,8 @@ services:
       PGID: ${PGID}
       PUID: ${PUID}
       TZ: ${TZ}
+    labels:
+      - "traefik.enable=false"
 
   authentik-redis:
     image: docker.io/library/redis:alpine
@@ -31,11 +33,13 @@ services:
       retries: 5
       timeout: 3s
     volumes:
-      - $HOST_CONFIG_PATH/authentik-redis:/data
+      - ./authentik/redis:/data
     environment:
       PGID: ${PGID}
       PUID: ${PUID}
       TZ: ${TZ}
+    labels:
+      - "traefik.enable=false"
 
   authentik:
     image: ghcr.io/goauthentik/server:latest
@@ -55,8 +59,9 @@ services:
       PUID: ${PUID}
       TZ: ${TZ}
     volumes:
-      - $HOST_CONFIG_PATH/authentik-media:/media
-      - $HOST_CONFIG_PATH/authentik-templates:/templates
+      - ./authentik/media:/media
+      - ./authentik/templates:/templates
+      - ./authentik/user_settings.py:/data/user_settings.py
     depends_on:
       - authentik-db
       - authentik-redis
@@ -87,9 +92,11 @@ services:
     user: root
     volumes:
       #- /var/run/docker.sock:/var/run/docker.sock
-      - $HOST_CONFIG_PATH/authentik-media:/media
-      - $HOST_CONFIG_PATH/authentik-certs:/certs
-      - $HOST_CONFIG_PATH/authentik-templates:/templates
+      - ./authentik/media:/media
+      - ./authentik/certs:/certs
+      - ./authentik/templates:/templates
     depends_on:
       - authentik-db
       - authentik-redis
+    labels:
+      - "traefik.enable=false"

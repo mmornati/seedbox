@@ -16,6 +16,7 @@ services/custom/*.yml
 services/generated/*.yaml
 
 authelia/*
+authentik/*
 .env.custom
 *.env
 redis/*
