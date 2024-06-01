@@ -63,8 +63,12 @@ Version 2 is released, please make sure you read [this V2 Migration Guide](doc/U
 | Homarr            | homarr.yourdomain.com   | [ajnart/homarr](https://ghcr.io/ajnart/homarr)| *latest*                | Main dashboard (alt)     |
 | Homepage            | homepage.yourdomain.com   | [gethomepage/homepage](ghcr.io/gethomepage/homepage)| *latest*                | Main dashboard (alt)     |
 | Syncthing         | syncthing.yourdomain.com |  [linuxserver/syncthing](https://hub.docker.com/r/linuxserver/syncthing) | *latest* | P2P files sharing |
+| Uptime-Kuma         | uptime.yourdomain.com |  [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma) | *latest* | Uptime checker service |
 | Traefik | traefik.yourdomain.com | [traefik](https://hub.docker.com/_/traefik) | *latest* | Traefik reverse proxy (access to admin dashboard) |
 | Gluetun            | -   | [qdm12/gluetun](https:/ghcr.io/qdm12/gluetun)| *latest*                | VPN client             |
+| Authentik            | -   | [ghcr.io/goauthentik/server](https:/ghcr.io/goauthentik/server)| *latest*                | SSO Auth App             |
+| Authelia            | -   | [authelia/authelia:latest](https://github.com/authelia/authelia)| *latest*                | SSO Auth App             |
+| Zitadel            | -   | [ghcr.io/zitadel/zitadel:latest](https://ghcr.io/zitadel/zitadel:latest)| *latest*                | SSO Auth App             |
 | *Any application you want!* | *whatever.yourdomain.com* | *Any image* | *Any tag* | *Any service - See the [Configuration Guide](doc/configuration.md)* |
 
 ## 🌐 Traefik
@@ -128,22 +132,3 @@ Thanks to the **local-persist** Docker plugin, the data located in these volumes
 
 - Some indications here (more to come): [Apps Configuration](doc/configuration.md#apps-configuration)
 - [TRaSH Guides](https://trash-guides.info/)
-
-# App Specific
-
-## Authentik
-If you are using Authentik on a custom domain, to prevent CSRF error, you need to allow your hostname by configuring.
-Create a file named `user_settings.py` with a content like the following one:
-```
-CSRF_TRUSTED_ORIGINS = ["https://authentik.mydomain.ltd", "https://*.mydomain.ltd"]
-```
-
-Store this file within the authentik config volume:
-```
-- ./authentik/user_settings.py:/data/user_settings.py
-```
-
-NB: In the provided configuration volume is in the local folder to prevent chown error on my personal FAT32 configration. Linux is not able to properly change the file ownership on FAT32 systems.
-
-Each application you want to protect required a specifc entry in Authentik. A step by step guide can be found here: https://docs.ibracorp.io/authentik/authentik/docker-compose/traefik-forward-auth-single-applications
-Once configured you just need to put `sso: true` on the config.yaml file and execute the run script to create the new configuration.

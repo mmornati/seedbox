@@ -96,7 +96,7 @@ services:
       rules:
           # First "regular" routing rule
         - host: sonarr.${TRAEFIK_DOMAIN}
-          httpAuth: true
+          sso: true
           internalPort: 8989
           # Another rule which bypasses certificate generation using Let's Encrypt (ACME challenge).
         - host: sonarr-unsecure.${TRAEFIK_DOMAIN}
@@ -323,5 +323,6 @@ This file will be automatically placed in [traefik/custom/](../traefik/custom/) 
 List of currently available documentation for apps:
 
 - [Deluge + Flood](apps/deluge-flood.md)
+- [Authentik](apps/authentik.md)
 
 I also strongly recommend [TRaSH Guides](https://trash-guides.info/) to have a better overview of all *arrs apps configurations.

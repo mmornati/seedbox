@@ -1,0 +1,17 @@
+services:
+  uptime-kula:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - uptimekuma:/app/data
+
+volumes:
+  uptimekuma:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_CONFIG_PATH/uptime-kuma
