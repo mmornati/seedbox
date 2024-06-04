@@ -6,3 +6,8 @@
 networks: 
   default:
     name: "traefik-network"
+    external: true
+  cloudflare-transport:
+    name: "cloudflare-transport"
+    
+  

@@ -333,6 +333,12 @@ services:
         - host: uptime.${TRAEFIK_DOMAIN}
           httpAuth: true
           internalPort: 3001
+  - name: cloudflared
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: false
+      rules: []
   # Gluetun is the VPN client service.
   - name: gluetun
     enabled: false
