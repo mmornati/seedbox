@@ -132,3 +132,44 @@ Thanks to the **local-persist** Docker plugin, the data located in these volumes
 
 - Some indications here (more to come): [Apps Configuration](doc/configuration.md#apps-configuration)
 - [TRaSH Guides](https://trash-guides.info/)
+
+# CloudFlare setup for CloudFlare Tunnel
+
+## Migrate DNS Server
+* Desactivate, if needed, the DNSSEC configuration on your registrar
+* Change the DNS Servers to put the one provided by cloudflare during the account registration / domain add
+* Wait for names to be propaged
+
+### How to debug?
+To validate that everything is correctly migrated, you can check your domain(s) and subdomain(s) on this website. It is debugging different configuration problem and driving to the possible solution
+https://cf.sjr.org.uk/tools/check
+
+# Configure CloudflareD
+Everything described in the following documentation 
+https://gero.dev/blog/cloudflared-traefik-docker
+
+To simplify the configuration, the service is already configured in config.sample.yaml. You just need to activate it as all other services:
+```
+- name: cloudflared
+  enabled: true
+  vpn: false
+  traefik:
+    enabled: false
+    rules: []
+```
+Then manually add (as described in the previous documentation link) the certificates in the Traefik Custom configuration folder (here configured with the `- ./traefik:/etc/traefik:ro` volume. So usually in the seedbox project folder).
+This means in your `./traefik/custom` folder you have to create:
+* the `domain.key` and `domain.pem` file
+* the `certificate.yaml` file as described in the documentation. As everything is in the same folder, the certificates file is without the path.
+```
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: domain.pem
+        keyFile: domain.key
+
+  certificates:
+    - certFile: domain.pem
+      keyFile: domain.key
+``` 
