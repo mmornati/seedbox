@@ -339,6 +339,12 @@ services:
     traefik:
       enabled: false
       rules: []
+  - name: nextdns
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: false
+      rules: []
   # Gluetun is the VPN client service.
   - name: gluetun
     enabled: false

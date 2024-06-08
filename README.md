@@ -69,6 +69,7 @@ Version 2 is released, please make sure you read [this V2 Migration Guide](doc/U
 | Authentik            | -   | [ghcr.io/goauthentik/server](https:/ghcr.io/goauthentik/server)| *latest*                | SSO Auth App             |
 | Authelia            | -   | [authelia/authelia:latest](https://github.com/authelia/authelia)| *latest*                | SSO Auth App             |
 | Zitadel            | -   | [ghcr.io/zitadel/zitadel:latest](https://ghcr.io/zitadel/zitadel:latest)| *latest*                | SSO Auth App             |
+| NextDNS            | -   | [hub.docker.com/r/timoreymann/nextdns-ip-updater:latest](https://hub.docker.com/r/timoreymann/nextdns-ip-updater)| *latest*                | NextDNS Linked IP Updater             |
 | *Any application you want!* | *whatever.yourdomain.com* | *Any image* | *Any tag* | *Any service - See the [Configuration Guide](doc/configuration.md)* |
 
 ## 🌐 Traefik

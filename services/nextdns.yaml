@@ -1,0 +1,9 @@
+services:
+  nextdns:
+    image: timoreymann/nextdns-ip-updater:latest
+    container_name: next-dns
+    mem_limit: 16m
+    environment:
+      NEXTDNS_CONFIG_ID: ${NEXTDNS_CONFIG_IDS}
+      NEXTDNS_ACCOUNT_ID: ${NEXTDNS_ACCOUNT_ID}
+    restart: always
