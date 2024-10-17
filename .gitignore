@@ -20,3 +20,7 @@ authentik/*
 .env.custom
 *.env
 redis/*
+**/*.key
+**/*.pem
+qbittorrent/**
+traefik/custom/certificates.yaml

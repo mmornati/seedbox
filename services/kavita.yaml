@@ -4,7 +4,7 @@ services:
     container_name: kavita
     restart: always
     volumes:
-      - $HOST_CONFIG_PATH/kavita:/kavita/config
+      - $HOST_CONFIG_PATH/kavita:/config
       - $HOST_MEDIA_PATH:/torrents
       - $HOST_MEDIA_PATH_2:/media
       - /etc/localtime:/etc/localtime:ro
