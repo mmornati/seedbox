@@ -20,4 +20,10 @@ services:
       - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       - WIREGUARD_ADDRESS=${WIREGUARD_ADDRESS}
     volumes:
-      - $HOST_CONFIG_PATH/gluetun:/config
+      - gluetunconfig:/config
+
+volumes:
+  gluetunconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/gluetun

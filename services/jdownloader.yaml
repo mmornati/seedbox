@@ -4,9 +4,19 @@ services:
     container_name: jdownloader
     restart: always
     volumes:
-      - $HOST_CONFIG_PATH/jdownloader:/config
-      - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/output
+      - jdownloaderconfig:/config
+      - jdownloadermedia:/output
     environment:
       - USER_ID=${PUID}
       - GROUP_ID=${PGID}
       - TZ=${TZ}
+
+volumes:
+  jdownloadermedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER
+  jdownloaderconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/jdownloader

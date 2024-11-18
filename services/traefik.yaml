@@ -12,12 +12,22 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik:/etc/traefik:ro
-      - $HOST_CONFIG_PATH/traefik:/config
+      - traefiketc:/etc/traefik:ro
+      - traefikconfig:/config
     environment:
       - TRAEFIK_DOMAIN=${TRAEFIK_DOMAIN}
       - TZ=${TZ}
     networks:
       - default
       - cloudflare-transport
+
+volumes:
+  traefikconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/traefik
+  traefiketc:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/traefik-etc
 

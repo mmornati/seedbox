@@ -4,11 +4,25 @@ services:
     container_name: lidarr
     restart: always
     volumes:
-      - $HOST_CONFIG_PATH/lidarr:/config
-      - $HOST_MEDIA_PATH:/torrents
+      - lidarrconfig:/config
+      - lidarrmedia:/torrents
       - $HOST_MEDIA_PATH_2:/media
-      - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads
+      - lidarrdownloads:/downloads
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
+
+volumes:
+  lidarrmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH
+  lidarrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/lidarr
+  lidarrdownloads:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER

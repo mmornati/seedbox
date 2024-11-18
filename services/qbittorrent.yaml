@@ -4,9 +4,19 @@ services:
     container_name: qbittorrent
     restart: always
     volumes:
-      - $HOST_MEDIA_PATH:/torrents
-      - ./qbittorrent:/config
+      - qbittorrentmedia:/torrents
+      - qbittorrentconfig:/config
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
+
+volumes:
+  qbittorrentmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH
+  qbittorrentconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/qbittorrent

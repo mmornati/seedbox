@@ -10,5 +10,15 @@ services:
       - DOCKER_MODS=linuxserver/mods:universal-calibre
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     volumes:
-      - $HOST_CONFIG_PATH/calibre:/config
-      - $HOST_MEDIA_PATH:/torrents
+      - calibreconfig:/config
+      - calibremedia:/torrents
+
+volumes:
+  calibremedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH
+  calibreconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/calibre

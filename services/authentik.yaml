@@ -10,7 +10,7 @@ services:
       retries: 5
       timeout: 5s
     volumes:
-      - ./authentik/db:/var/lib/postgresql/data
+      - authentikdb:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${PG_PASS:?database password required}
       POSTGRES_USER: ${PG_USER:-authentik}
@@ -33,7 +33,7 @@ services:
       retries: 5
       timeout: 3s
     volumes:
-      - ./authentik/redis:/data
+      - authentikredis:/data
     environment:
       PGID: ${PGID}
       PUID: ${PUID}
@@ -59,9 +59,9 @@ services:
       PUID: ${PUID}
       TZ: ${TZ}
     volumes:
-      - ./authentik/media:/media
-      - ./authentik/templates:/templates
-      - ./authentik/user_settings.py:/data/user_settings.py
+      - authentikmedia:/media
+      - authentiktemplates:/templates
+      - $CONFIG_PATH/authentik/user_settings.py:/data/user_settings.py
     depends_on:
       - authentik-db
       - authentik-redis
@@ -92,11 +92,37 @@ services:
     user: root
     volumes:
       #- /var/run/docker.sock:/var/run/docker.sock
-      - ./authentik/media:/media
-      - ./authentik/certs:/certs
-      - ./authentik/templates:/templates
+      - authentikmedia:/media
+      - authentikcerts:/certs
+      - authentiktemplates:/templates
     depends_on:
       - authentik-db
       - authentik-redis
     labels:
       - "traefik.enable=false"
+
+volumes:
+  authentikdb:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/db
+  authentikredis:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/redis
+  authentikmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/media
+  authentiktemplates:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/templates
+  authentikcerts:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/certs
+  authentikusersettings:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/authentik/user_settings.py

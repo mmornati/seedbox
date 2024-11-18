@@ -29,4 +29,4 @@ volumes:
   uptimekuma:
     driver: local-persist
     driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/uptime-kuma
+      mountpoint: $CONFIG_PATH/uptime-kuma

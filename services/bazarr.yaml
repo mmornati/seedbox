@@ -4,9 +4,19 @@ services:
     container_name: bazarr
     restart: always
     volumes:
-      - $HOST_MEDIA_PATH:/torrents
-      - $HOST_CONFIG_PATH/bazarr:/config
+      - bazarrmedia:/torrents
+      - bazarrconfig:/config
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
+
+volumes:
+  bazarrmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH
+  bazarrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/bazarr

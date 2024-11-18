@@ -4,8 +4,14 @@ services:
     container_name: prowlarr
     restart: always
     volumes:
-      - $HOST_CONFIG_PATH/prowlarr:/config
+      - prowlarrconfig:/config
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
+
+volumes:
+  prowlarrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/prowlarr

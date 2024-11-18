@@ -4,8 +4,14 @@ services:
     container_name: overseerr
     restart: always
     volumes:
-      - $HOST_CONFIG_PATH/overseerr:/config
+      - overseerrconfig:/config
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
+
+volumes:
+  overseerrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/overseerr

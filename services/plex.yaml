@@ -5,11 +5,21 @@ services:
     restart: always
     network_mode: host
     volumes:
-      - $HOST_CONFIG_PATH/plex:/config
-      - $HOST_MEDIA_PATH:/torrents
+      - plexconfig:/config
+      - plexmedia:/torrents
       - $HOST_MEDIA_PATH_2:/media
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=${TZ}
       - VERSION=latest
+
+volumes:
+  plexmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH
+  plexconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/plex
