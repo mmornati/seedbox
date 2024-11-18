@@ -7,9 +7,9 @@ services:
     devices:
       - /dev/dri:/dev/dri # for hardware transcoding
     volumes:
-      - $HOST_CONFIG_PATH/Plex:/config
+      - $HOST_CONFIG_PATH/plex:/config
       - $HOST_MEDIA_PATH:/torrents
-      - /dev/shm:/transcode
+      - $HOST_MEDIA_PATH_2:/media
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
