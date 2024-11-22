@@ -6,6 +6,7 @@ services:
     volumes:
       - radarrconfig:/config
       - radarrmedia:/torrents
+      - radarrmedia2:/media
       - radarrmovies:/movies
       - radarrdownloads:/downloads
       - /etc/localtime:/etc/localtime:ro
@@ -19,6 +20,10 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $HOST_MEDIA_PATH
+  radarrmedia2:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH_2
   radarrconfig:
     driver: local-persist
     driver_opts:

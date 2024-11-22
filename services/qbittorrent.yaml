@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - qbittorrentmedia:/torrents
+      - qbittorrentmedia2:/media
       - qbittorrentconfig:/config
     environment:
       - PGID=${PGID}
@@ -16,6 +17,10 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $HOST_MEDIA_PATH
+  qbittorrentmedia2:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH_2
   qbittorrentconfig:
     driver: local-persist
     driver_opts:

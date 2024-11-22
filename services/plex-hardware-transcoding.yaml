@@ -9,7 +9,7 @@ services:
     volumes:
       - plexconfig:/config
       - plexmedia:/torrents
-      - $HOST_MEDIA_PATH_2:/media
+      - plexmedia2:/media
     environment:
       - PGID=${PGID}
       - PUID=${PUID}
@@ -21,6 +21,10 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $HOST_MEDIA_PATH
+  plexmedia2:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH_2
   plexconfig:
     driver: local-persist
     driver_opts:
