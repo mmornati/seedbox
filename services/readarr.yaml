@@ -7,7 +7,8 @@ services:
       - readarrconfig:/config
       - readarrmedia:/torrents
       - readarrdownloads:/downloads
-      - $HOST_MEDIA_PATH_2:/media
+      - readarrmedia2:/media
+      - calibrelibrary:/mnt
       - /etc/localtime:/etc/localtime:ro
     environment:
       - PGID=${PGID}
@@ -19,10 +20,18 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $HOST_MEDIA_PATH
+  readarrmedia2:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH_2
   readarrconfig:
     driver: local-persist
     driver_opts:
       mountpoint: $CONFIG_PATH/readarr
+  calibrelibrary:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/calibre
   readarrdownloads:
     driver: local-persist
     driver_opts:

@@ -23,8 +23,8 @@ volumes:
   ntfycache:
     driver: local-persist
     driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/ntfy/cache
+      mountpoint: $CONFIG_PATH/ntfy/cache
   ntfyconf:
     driver: local-persist
     driver_opts:
-      mountpoint: $HOST_CONFIG_PATH/ntfy/conf
+      mountpoint: $CONFIG_PATH/ntfy/conf

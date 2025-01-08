@@ -6,7 +6,7 @@ services:
     volumes:
       - lidarrconfig:/config
       - lidarrmedia:/torrents
-      - $HOST_MEDIA_PATH_2:/media
+      - lidarrmedia2:/media
       - lidarrdownloads:/downloads
     environment:
       - PGID=${PGID}
@@ -18,6 +18,10 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $HOST_MEDIA_PATH
+  lidarrmedia2:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $HOST_MEDIA_PATH_2
   lidarrconfig:
     driver: local-persist
     driver_opts:

@@ -5,18 +5,20 @@ services:
     restart: always
     command:
       - --certificatesresolvers.le.acme.email=${ACME_MAIL}
-      - "--accesslog=true"
-      - "--accesslog.filePath=/config/access.log"
+    labels:
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - traefiketc:/etc/traefik:ro
+      - ./traefik:/etc/traefik:ro
       - traefikconfig:/config
     environment:
       - TRAEFIK_DOMAIN=${TRAEFIK_DOMAIN}
       - TZ=${TZ}
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_DNS_API_TOKEN=${CF_API_TOKEN}
     networks:
       - default
       - cloudflare-transport
@@ -26,8 +28,3 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $CONFIG_PATH/traefik
-  traefiketc:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $CONFIG_PATH/traefik-etc
-

@@ -1,6 +1,6 @@
 services:
   authentik-db:
-    image: docker.io/library/postgres:12-alpine
+    image: docker.io/library/postgres:16-alpine
     restart: always
     container_name: authentik-db
     healthcheck:
@@ -65,6 +65,18 @@ services:
     depends_on:
       - authentik-db
       - authentik-redis
+    labels:
+      - "traefik.enable=true"
+      # HTTP Routers
+      - "traefik.http.routers.authentik-rtr.entrypoints=secure"
+      - "traefik.http.routers.authentik-rtr.rule=Host(`authentik.$TRAEFIK_DOMAIN`)"
+      # Middlewares
+      #- "traefik.http.routers.authentik-rtr.middlewares=chain-no-auth@file"
+      # Catch any subdomain using individual application forward authentication
+      - "traefik.http.routers.authentik-output-rtr.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.${TRAEFIK_DOMAIN}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+      # HTTP Services
+      - "traefik.http.routers.authentik-rtr.service=authentik-svc"
+      - "traefik.http.services.authentik-svc.loadbalancer.server.port=9000"
 
   authentik-worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:latest
@@ -80,8 +92,8 @@ services:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
       AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
-      PGID: ${PGID}
-      PUID: ${PUID}
+        #PGID: ${PGID}
+        #PUID: ${PUID}
       TZ: ${TZ}
     # `user: root` and the docker socket volume are optional.
     # See more for the docker socket integration here:
@@ -91,7 +103,7 @@ services:
     # (1000:1000 by default)
     user: root
     volumes:
-      #- /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
       - authentikmedia:/media
       - authentikcerts:/certs
       - authentiktemplates:/templates
@@ -100,7 +112,6 @@ services:
       - authentik-redis
     labels:
       - "traefik.enable=false"
-
 volumes:
   authentikdb:
     driver: local-persist
