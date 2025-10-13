@@ -9,11 +9,6 @@ services:
     environment:
       - TZ=${TZ}
       - NTFY_BASE_URL=https://ntfy.${TRAEFIK_DOMAIN}
-      - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh
-      - NTFY_WEB_PUSH_PUBLIC_KEY=BB7JTYtmgEZgKqguuhVmB0IBlnlEU0m3lCjhJY-UktI2lCMaHtv-L2mIGYoFL8fkXrRfddfCh0thbpgzfeJy9a0
-      - NTFY_WEB_PUSH_PRIVATE_KEY=T4rhg0gWFvOPpJoOB9yRasC3M6m6WFhnPabrJN7a-IU
-      - NTFY_WEB_PUSH_FILE=/conf/webpush.db
-      - NTFY_WEB_PUSH_EMAIL_ADDRESS=mailto:marco@mornati.net
       - NTFY_LISTEN_HTTP=:2586
       - NTFY_BEHIND_PROXY=true
       - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db

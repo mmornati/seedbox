@@ -351,13 +351,3 @@ services:
     traefik:
       enabled: false
       rules: []
-  - name: lazylibrarian
-    enabled: false
-    vpn: false
-    traefik:
-      enabled: true
-      rules:
-        - host: lazylibrarian.${TRAEFIK_DOMAIN}
-          sso: true
-          httpOnly: true
-          internalPort: 5299
