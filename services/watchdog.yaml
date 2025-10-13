@@ -1,0 +1,24 @@
+services:
+  watchdog:
+    image: python:3.11-slim
+    container_name: watchdog
+    network_mode: "container:gluetun"
+    volumes:
+      - ./tools/watchdog.py:/watchdog.py:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - QBT_HOST=${QBT_HOST:-http://127.0.0.1:8080}
+      - QBT_USER=${QBT_USER:-admin}
+      - QBT_PASS=${QBT_PASS:?password required}
+      - QBT_CONTAINER_NAME=${QBT_CONTAINER_NAME:-qbittorrent}
+      - GLUETUN_CONTAINER_NAME=${GLUETUN_CONTAINER_NAME:-gluetun}
+      - GLUETUN_CONTROL_USER=${GLUETUN_CONTROL_USER:-api}
+      - GLUETUN_CONTROL_PASSWORD=${GLUETUN_CONTROL_PASSWORD:?password required}
+      - CHECK_INTERVAL=${CHECK_INTERVAL:-60}
+      - MAX_STALLED=${MAX_STALLED:-5}
+      - MIN_PEERS=${MIN_PEERS:-1}
+      - NTFY_TOPIC=${NTFY_TOPIC:-uptime}
+      - DRY_RUN=${DRY_RUN:-true}
+    command: >
+      sh -c "pip install --no-cache-dir requests docker && python /watchdog.py"
+    restart: unless-stopped
