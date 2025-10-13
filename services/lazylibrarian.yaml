@@ -1,0 +1,23 @@
+services:
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: lazylibrarian
+    environment:
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
+    volumes:
+      - lazylibrarian_config:/config
+      - $HOST_MEDIA_PATH/$DOWNLOAD_SUBFOLDER:/downloads/completed
+      - $CONFIG_PATH/calibre:/books #optional
+
+volumes:
+  lazylibrarian_config:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/lazylibrarian/data
+  booksmedia:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/calibre
