@@ -9,6 +9,11 @@ services:
     environment:
       - TZ=${TZ}
       - NTFY_BASE_URL=https://ntfy.${TRAEFIK_DOMAIN}
+      - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh
+      - NTFY_WEB_PUSH_PUBLIC_KEY=${NTFY_WEB_PUSH_PUBLIC_KEY:?missing pub key}
+      - NTFY_WEB_PUSH_PRIVATE_KEY=${NTFY_WEB_PUSH_PRIVATE_KEY:?missing private key}
+      - NTFY_WEB_PUSH_FILE=${NTFY_WEB_PUSH_FILE:-/conf/webpush.db}
+      - NTFY_WEB_PUSH_EMAIL_ADDRESS=${NTFY_WEB_PUSH_EMAIL_ADDRESS:-mailto:my@email.ltd}
       - NTFY_LISTEN_HTTP=:2586
       - NTFY_BEHIND_PROXY=true
       - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
