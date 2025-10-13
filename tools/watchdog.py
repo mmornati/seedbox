@@ -37,6 +37,7 @@ QBT_HOST = os.getenv("QBT_HOST", "http://127.0.0.1:8080")
 QBT_USER = os.getenv("QBT_USER", "admin")
 QBT_PASS = os.getenv("QBT_PASS", "adminadmin")
 QBT_CONTAINER_NAME = os.getenv("QBT_CONTAINER_NAME", "qbittorrent")
+NTFY_SERVER = os.getenv("NTFY_SERVER", "https://ntfy.sh")
 GLUETUN_CONTAINER_NAME = os.getenv("GLUETUN_CONTAINER_NAME", "gluetun")
 GLUETUN_CONTROL_USER = os.getenv("GLUETUN_CONTROL_USER", "api")
 GLUETUN_CONTROL_PASS = os.getenv("GLUETUN_CONTROL_PASSWORD", "password")
@@ -159,7 +160,7 @@ def notify(subject: str, body: str = ""):
     if not NTFY_TOPIC:
         return
     try:
-        url = f"https://ntfy.mornati.ovh/{NTFY_TOPIC}"
+        url = f"{NTFY_SERVER}/{NTFY_TOPIC}"
         requests.post(url, data=f"{subject}\n{body}")
     except Exception as e:
         logger.warning("Notification failed: %s", e)
