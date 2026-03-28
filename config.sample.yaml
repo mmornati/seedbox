@@ -361,3 +361,12 @@ services:
           sso: true
           httpOnly: true
           internalPort: 5299
+  - name: seedbox-ui
+    enabled: true
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: seedbox.${TRAEFIK_DOMAIN}
+          sso: true
+          internalPort: 3000

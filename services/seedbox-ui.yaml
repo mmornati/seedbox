@@ -1,0 +1,14 @@
+services:
+  seedbox-ui:
+    image: seedbox-ui:latest
+    pull_policy: never
+    container_name: seedbox-ui
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${SEEDBOX_PATH}:/seedbox
+    environment:
+      - SEEDBOX_PATH=/seedbox
+      - TZ=${TZ}
+      - PUID=1000
+      - PGID=1000

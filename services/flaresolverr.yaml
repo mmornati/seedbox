@@ -1,7 +1,17 @@
 services:
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest 
     container_name: flaresolverr
     restart: always
+    volumes:
+      - flaresolverrconfig:/config
     environment:
-      - CAPTCHA_SOLVER=hcaptcha-solver
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ}
+
+volumes:
+  flaresolverrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/flaresolverr
