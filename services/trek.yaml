@@ -1,0 +1,21 @@
+services:
+  trek:
+    image: mauriceboe/nomad:latest
+    container_name: trek
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - trek-data:/app/data
+      - trek-uploads:/app/uploads
+
+volumes:
+  trek-data:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/trek-data
+  trek-uploads:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/trek-uploads
