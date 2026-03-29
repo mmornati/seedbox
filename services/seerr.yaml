@@ -4,9 +4,9 @@ services:
     container_name: seerr
     restart: always
     init: true
-    user: "${PUID}:${PGID}"
+    user: "1001:1001"
     volumes:
-      - seerrconfig:/config
+      - seerrconfig:/app/config
     environment:
       - TZ=${TZ}
 
