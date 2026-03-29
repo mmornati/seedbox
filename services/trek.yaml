@@ -6,6 +6,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - FORCE_HTTPS=false
+      - TRUST_PROXY=1
+      - ALLOWED_ORIGINS=https://trek.${TRAEFIK_DOMAIN}
+      - EXTERNAL_URL=https://trek.${TRAEFIK_DOMAIN}
     volumes:
       - trek-data:/app/data
       - trek-uploads:/app/uploads

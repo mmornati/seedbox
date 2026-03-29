@@ -5,7 +5,7 @@ heimdall: 80
 jackett: 9117
 jdownloader: 5800
 ombi: 3579
-overseerr: 5055
+seerr: 5055
 plex: 32400
 prowlarr: 9696
 radarr: 7878

@@ -77,7 +77,7 @@ cat services.conf | while read line || [[ -n $line ]]; do
       enableTraefik="true"
       # If Traefik enabled => define if http auth Traefik middleware must be set by default
       case $key in
-        kavita|komga|nextcloud|ombi|overseerr|plex|portainer|tautulli)
+        kavita|komga|nextcloud|ombi|seerr|plex|portainer|tautulli)
           defaultHttpAuth="false"
           ;;
         *)

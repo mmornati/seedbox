@@ -187,13 +187,13 @@ services:
         - host: ombi.${TRAEFIK_DOMAIN}
           httpAuth: false
           internalPort: 3579
-  - name: overseerr
+  - name: seerr
     enabled: true
     vpn: false
     traefik:
       enabled: true
       rules:
-        - host: overseerr.${TRAEFIK_DOMAIN}
+        - host: seerr.${TRAEFIK_DOMAIN}
           httpAuth: false
           internalPort: 5055
   - name: tautulli
@@ -368,7 +368,7 @@ services:
       enabled: true
       rules:
         - host: trek.${TRAEFIK_DOMAIN}
-          sso: true
+          httpAuth: false
           internalPort: 3000
   - name: seedbox-ui
     enabled: true

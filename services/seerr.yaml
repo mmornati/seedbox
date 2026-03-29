@@ -1,0 +1,17 @@
+services:
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    restart: always
+    init: true
+    user: "${PUID}:${PGID}"
+    volumes:
+      - seerrconfig:/config
+    environment:
+      - TZ=${TZ}
+
+volumes:
+  seerrconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/overseerr
