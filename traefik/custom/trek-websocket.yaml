@@ -1,16 +1,14 @@
-http:
-  routers:
-    trek-ws:
-      rule: "PathPrefix(`/ws`)"
-      service: trek-ws-svc
-      entryPoints:
-        - secure
-      tls:
-        certResolver: le
-      middlewares:
-        - chain-authelia
-  services:
-    trek-ws-svc:
-      loadBalancer:
-        servers:
-          - url: "http://trek:3000"
+#http:
+#  routers:
+#    trek-ws:
+#      rule: "PathPrefix(`/ws`)"
+#      service: trek-ws-svc
+#      entryPoints:
+#        - secure
+#      tls:
+#        certResolver: le
+#  services:
+#    trek-ws-svc:
+#      loadBalancer:
+#        servers:
+#          - url: "http://trek:3000"
