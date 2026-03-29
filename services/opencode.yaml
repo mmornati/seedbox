@@ -1,0 +1,39 @@
+services:
+  opencode:
+    image: ghcr.io/pilinux/opencode:1.3.6
+    container_name: opencode
+    restart: always
+    init: true
+    user: "${PUID}:${PGID}"
+    environment:
+      - TZ=${TZ}
+      - OPENCODE_SERVER_USERNAME=${OPENCODE_USERNAME}
+      - OPENCODE_SERVER_PASSWORD=${OPENCODE_PASSWORD}
+    volumes:
+      - opencodeconfig:/home/opencode/.config/opencode
+      - opencodestate:/home/opencode/.local/state/opencode
+      - opencodeshare:/home/opencode/.local/share/opencode
+      - $CONFIG_PATH/opencode/workspace:/workspace
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.opencode-rtr.entrypoints=secure"
+      - "traefik.http.routers.opencode-rtr.rule=Host(`opencode.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.opencode-rtr.middlewares=authentik@file"
+      - "traefik.http.routers.opencode-sso.rule=Host(`opencode.${TRAEFIK_DOMAIN}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+      - "traefik.http.routers.opencode-sso.middlewares=authentik@file"
+      - "traefik.http.routers.opencode-rtr.service=opencode-svc"
+      - "traefik.http.services.opencode-svc.loadbalancer.server.port=4096"
+
+volumes:
+  opencodeconfig:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/opencode/config
+  opencodestate:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/opencode/state
+  opencodeshare:
+    driver: local-persist
+    driver_opts:
+      mountpoint: $CONFIG_PATH/opencode/share

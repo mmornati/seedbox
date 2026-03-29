@@ -278,6 +278,15 @@ services:
         - host: netdata.${TRAEFIK_DOMAIN}
           httpAuth: true
           internalPort: 19999
+  - name: opencode
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: opencode.${TRAEFIK_DOMAIN}
+          sso: true
+          internalPort: 4096
   - name: duplicati
     enabled: false
     vpn: false
