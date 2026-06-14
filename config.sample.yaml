@@ -388,3 +388,12 @@ services:
         - host: seedbox.${TRAEFIK_DOMAIN}
           sso: true
           internalPort: 3000
+  - name: rss-proxy
+    enabled: false
+    vpn: false
+    traefik:
+      enabled: true
+      rules:
+        - host: rss.${TRAEFIK_DOMAIN}
+          httpAuth: false
+          internalPort: 3000
