@@ -388,6 +388,8 @@ echo-debug "[$0] Here is the list of all files which are going to be processed: 
 echo "[$0] ***** Config OK. Launching services... *****"
 
 if [[ "${SKIP_PULL}" != "1" ]]; then
+  echo "[$0] ***** Building local images (services with a build context)... *****"
+  ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} build --pull || echo "[$0] WARN: 'docker compose build' failed (likely no build context in any service) — continuing with pull only."
   echo "[$0] ***** Pulling all images... *****"
   ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} pull
 fi

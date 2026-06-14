@@ -4,6 +4,7 @@ services:
       context: ./rss-proxy
       dockerfile: Dockerfile
     image: rss-proxy:local
+    pull_policy: never
     container_name: rss-proxy
     restart: always
     init: true
