@@ -1,7 +1,7 @@
 services:
   rss-proxy:
     build:
-      context: ./rss-proxy
+      context: ./services/rss-proxy
       dockerfile: Dockerfile
     image: rss-proxy:local
     pull_policy: never
