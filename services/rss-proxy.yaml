@@ -1,0 +1,17 @@
+services:
+  rss-proxy:
+    build:
+      context: ./rss-proxy
+      dockerfile: Dockerfile
+    image: rss-proxy:local
+    container_name: rss-proxy
+    restart: always
+    init: true
+    user: "${PUID}:${PGID}"
+    environment:
+      - TZ=${TZ}
+      - RSS_URL=${RSS_PROXY_RSS_URL}
+      - CACHE_TTL_SECONDS=${RSS_PROXY_CACHE_TTL_SECONDS}
+      - PORT=3000
+      - NODE_ENV=production
+      - REFRESH_SECRET=${RSS_PROXY_REFRESH_SECRET}
