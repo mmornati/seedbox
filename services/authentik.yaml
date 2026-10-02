@@ -21,33 +21,12 @@ services:
     labels:
       - "traefik.enable=false"
 
-  authentik-redis:
-    image: docker.io/library/redis:alpine
-    command: --save 60 1 --loglevel warning
-    container_name: authentik-redis
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
-    volumes:
-      - authentikredis:/data
-    environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-    labels:
-      - "traefik.enable=false"
-
   authentik:
-    image: ghcr.io/goauthentik/server:latest
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.8}
     restart: always
     container_name: authentik
     command: server
     environment:
-      AUTHENTIK_REDIS__HOST: authentik-redis
       AUTHENTIK_POSTGRESQL__HOST: authentik-db
       AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
@@ -59,12 +38,11 @@ services:
       PUID: ${PUID}
       TZ: ${TZ}
     volumes:
-      - authentikmedia:/media
+      - authentikmedia:/data/media
       - authentiktemplates:/templates
       - $CONFIG_PATH/authentik/user_settings.py:/data/user_settings.py
     depends_on:
       - authentik-db
-      - authentik-redis
     labels:
       - "traefik.enable=true"
       # HTTP Routers
@@ -79,12 +57,11 @@ services:
       - "traefik.http.services.authentik-svc.loadbalancer.server.port=9000"
 
   authentik-worker:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:latest
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.8}
     restart: always
     container_name: authentik-worker
     command: worker
     environment:
-      AUTHENTIK_REDIS__HOST: authentik-redis
       AUTHENTIK_POSTGRESQL__HOST: authentik-db
       AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
@@ -104,12 +81,11 @@ services:
     user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - authentikmedia:/media
+      - authentikmedia:/data/media
       - authentikcerts:/certs
       - authentiktemplates:/templates
     depends_on:
       - authentik-db
-      - authentik-redis
     labels:
       - "traefik.enable=false"
 volumes:
@@ -117,10 +93,6 @@ volumes:
     driver: local-persist
     driver_opts:
       mountpoint: $CONFIG_PATH/authentik/db
-  authentikredis:
-    driver: local-persist
-    driver_opts:
-      mountpoint: $CONFIG_PATH/authentik/redis
   authentikmedia:
     driver: local-persist
     driver_opts:
