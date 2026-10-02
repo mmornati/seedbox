@@ -59,7 +59,7 @@ services:
       PUID: ${PUID}
       TZ: ${TZ}
     volumes:
-      - authentikmedia:/media
+      - authentikmedia:/data/media
       - authentiktemplates:/templates
       - $CONFIG_PATH/authentik/user_settings.py:/data/user_settings.py
     depends_on:
@@ -104,7 +104,7 @@ services:
     user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - authentikmedia:/media
+      - authentikmedia:/data/media
       - authentikcerts:/certs
       - authentiktemplates:/templates
     depends_on:
