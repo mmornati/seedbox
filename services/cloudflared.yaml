@@ -6,5 +6,7 @@ services:
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TOKEN}
+      # Use TCP (HTTP/2) instead of QUIC/UDP: more robust when UDP 7844 is flaky or filtered
+      - TUNNEL_TRANSPORT_PROTOCOL=http2
     networks:
       - cloudflare-transport
