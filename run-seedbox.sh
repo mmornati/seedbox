@@ -391,7 +391,7 @@ if [[ "${SKIP_PULL}" != "1" ]]; then
   echo "[$0] ***** Building local images (services with a build context)... *****"
   ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} build --pull || echo "[$0] WARN: 'docker compose build' failed (likely no build context in any service) — continuing with pull only."
   echo "[$0] ***** Pulling all images... *****"
-  ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} pull
+  ${DOCKER_COMPOSE_BINARY} ${ALL_SERVICES} pull --ignore-pull-failures || echo "[$0] WARN: some images could not be pulled (see errors above) — continuing with local images."
 fi
 
 if [[ "${SHUTDOWN}" != "1" ]]; then
